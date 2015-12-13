@@ -23,14 +23,18 @@ import telegram
 import cocktail
 from time import sleep
 
-
-TOKEN = None
-with open('dmittov.token') as fh:
-    TOKEN = fh.readline()
-
-
 def main():
+    logging.basicConfig(level = logging.DEBUG,
+        filename = 'debug.log',
+        format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
     # Telegram Bot Authorization Token
+    TOKEN = None
+    with open('prod.token') as fh:
+        TOKEN = fh.readline()
+
+    logging.info(TOKEN)
+
     bot = telegram.Bot(TOKEN)
 
     # get the first pending update_id, this is so we can skip over it in case
@@ -39,9 +43,6 @@ def main():
         update_id = bot.getUpdates()[0].update_id
     except IndexError:
         update_id = None
-
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     while True:
         try:
@@ -66,7 +67,10 @@ def response(bot, update_id):
         # chat_id is required to reply to any message
         chat_id = update.message.chat_id
         update_id = update.update_id + 1
-        message = cocktail.coctail_msg(update.message.text)
+        try:
+            message = cocktail.coctail_msg(update.message.text)
+        except Exception as e:
+            message = e.message
 
         if message:
             # Reply to the message
