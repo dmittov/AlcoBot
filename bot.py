@@ -22,6 +22,7 @@ import logging
 import telegram
 import cocktail
 from time import sleep
+from urllib2 import URLError
 
 def main():
     logging.basicConfig(level = logging.DEBUG,
