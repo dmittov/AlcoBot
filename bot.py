@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Simple Bot to reply to Telegram messages
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
-#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -17,29 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-
 import logging
 import telegram
 import cocktail
 from time import sleep
 from urllib2 import URLError
 
+
 def main():
-    logging.basicConfig(level = logging.DEBUG,
-        filename = 'debug.log',
-        format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename='debug.log',
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     # Telegram Bot Authorization Token
     TOKEN = None
     with open('prod.token') as fh:
         TOKEN = fh.readline()
-
     logging.info(TOKEN)
-
     bot = telegram.Bot(TOKEN)
-
-    # get the first pending update_id, this is so we can skip over it in case
-    # we get an "Unauthorized" exception.
     try:
         update_id = bot.getUpdates()[0].update_id
     except IndexError:
@@ -58,11 +51,10 @@ def main():
             else:
                 raise e
         except URLError as e:
-            # These are network problems on our end.
             sleep(1)
 
-def response(bot, update_id):
 
+def response(bot, update_id):
     # Request updates after the last update_id
     for update in bot.getUpdates(offset=update_id, timeout=10):
         # chat_id is required to reply to any message
@@ -72,12 +64,9 @@ def response(bot, update_id):
             message = cocktail.coctail_msg(update.message.text)
         except Exception as e:
             message = e.message
-
         if message:
-            # Reply to the message
             bot.sendMessage(chat_id=chat_id,
                             text=message)
-
     return update_id
 
 
